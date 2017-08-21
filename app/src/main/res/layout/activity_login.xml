@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Faculty load Scheduling App"
+        android:textAlignment="center"/>
+
+    <EditText
+
+        android:id="@+id/etUsername"
+        android:layout_marginTop="100sp"
+        android:layout_width="fill_parent"
+        android:layout_height="75sp"
+        android:background="@drawable/rect_text_edit"
+        android:layout_alignParentTop="true"
+        android:hint="Username"
+        android:textAlignment="center"
+        />
+
+    <EditText
+
+        android:id="@+id/etPassword"
+        android:layout_marginTop="25sp"
+        android:layout_width="fill_parent"
+        android:layout_height="75sp"
+        android:background="@drawable/rect_text_edit"
+        android:layout_alignParentTop="true"
+        android:textAlignment="center"
+        android:hint="Password"
+        android:inputType="textPassword"
+        />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_marginTop="25sp"
+        android:layout_width="match_parent"
+        android:layout_height="75sp"
+        android:text="Login"/>
+
+</LinearLayout>
