@@ -1,44 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/logbg"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Faculty load Scheduling App"
-        android:textAlignment="center"/>
+        android:text="Faculty Scheduling App"
+        android:textAlignment="center"
+        android:textColor="@color/materialLight"
+        android:textSize="30sp" />
 
-    <EditText
-
+    <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/etUsername"
-        android:layout_marginTop="100sp"
-        android:layout_width="fill_parent"
-        android:layout_height="75sp"
-        android:background="@drawable/rect_text_edit"
-        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:hint="Username"
-        android:textAlignment="center"
-        />
+        android:inputType="text"
+        app:met_baseColor="@color/materialLight"
+        app:met_floatingLabel="highlight"
+        app:met_primaryColor="@color/materialLight" />
 
-    <EditText
-
+    <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/etPassword"
-        android:layout_marginTop="25sp"
-        android:layout_width="fill_parent"
-        android:layout_height="75sp"
-        android:background="@drawable/rect_text_edit"
-        android:layout_alignParentTop="true"
-        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:hint="Password"
-        android:inputType="textPassword"
-        />
+        android:inputType="text"
+        app:met_baseColor="@color/materialLight"
+        app:met_floatingLabel="highlight"
+        app:met_primaryColor="@color/materialLight" />
+
 
     <Button
         android:id="@+id/btnLogin"
-        android:layout_marginTop="25sp"
         android:layout_width="match_parent"
-        android:layout_height="75sp"
-        android:text="Login"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/roundedbutton"
+        android:text="Login"
+        android:textColor="@color/materialLight" />
+
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/roundedbutton"
+        android:text="Register"
+        android:textColor="@color/materialLight" />
 
 </LinearLayout>

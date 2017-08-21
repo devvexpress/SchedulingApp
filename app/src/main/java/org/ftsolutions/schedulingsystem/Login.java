@@ -9,8 +9,8 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.ftsolutions.schedulingsystem.Home.Home;
 
@@ -41,8 +42,8 @@ public class Login extends AppCompatActivity {
 
         sharedPref_clear();
 
-        etUsername = (EditText) findViewById(R.id.etUsername);
-        etPassword = (EditText) findViewById(R.id.etPassword);
+        etUsername = (MaterialEditText) findViewById(R.id.etUsername);
+        etPassword = (MaterialEditText) findViewById(R.id.etPassword);
 
         Button btnLogin = (Button) findViewById(R.id.btnLogin);
 
@@ -71,12 +72,12 @@ public class Login extends AppCompatActivity {
                         obj.username = etUsername.getText().toString();
                         obj.password = etPassword.getText().toString();
 
-                        TelephonyManager tManager = (TelephonyManager)Login.this.getSystemService(Context.TELEPHONY_SERVICE);
+                        TelephonyManager tManager = (TelephonyManager) Login.this.getSystemService(Context.TELEPHONY_SERVICE);
                         assert tManager != null;
                         @SuppressLint({"MissingPermission", "HardwareIds"}) String uid = tManager.getDeviceId();
                         Log.d("ID", uid);
 
-                        String ua=new WebView(Login.this).getSettings().getUserAgentString();
+                        String ua = new WebView(Login.this).getSettings().getUserAgentString();
                         Log.d("AGENT: ", ua);
 
                         new downloadFromAPI(obj).execute();
@@ -93,80 +94,6 @@ public class Login extends AppCompatActivity {
         });
 
     }
-
-    class downloadFromAPI extends AsyncTask<Void, Void, Void> {
-        ProgressDialog progressDialog;
-        AlertDialog alertDialog;
-
-        LoginDetails loginDetails = null;
-
-        public downloadFromAPI(LoginDetails loginDetails) {
-            this.loginDetails = loginDetails;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Logging in...", true);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            Util util = new Util();
-
-            String url = "http://18.220.154.15/SchedulingSystem/";
-
-            HashMap<String, String> hashMap = new HashMap<String, String>();
-            hashMap.put("username", loginDetails.username);
-            hashMap.put("password", loginDetails.password);
-
-            Gson gson = new GsonBuilder()
-                    .excludeFieldsWithoutExposeAnnotation()
-                    .serializeNulls()
-                    .create();
-            String param = gson.toJson(hashMap);
-
-            String jsonString = util.callApi(url, param, 1);
-
-            LoginDetails obj = new Gson().fromJson(jsonString, LoginDetails.class);
-
-            if (obj.status.equals("200")) {
-
-
-                sharedPref_save(obj.FirstName + " " + obj.LastName, obj.active);
-
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            progressDialog.dismiss();
-
-            if (sharedPref_check()) {
-                if (sharedPref_getAccountStatus()==1) {
-
-                    Toast.makeText(Login.this, "Welcome", Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(Login.this, Home.class);
-                    startActivity(i);
-
-                } else {
-
-                    alertDialog = new AlertDialog.Builder(Login.this).create();
-                    alertDialog.setTitle(getApplicationContext().getResources().getString(R.string.app_name));
-                    alertDialog.setMessage("Your account is disabled. Contact the Administrator for more information.");
-                    alertDialog.show();
-
-                }
-            } else {
-                Toast.makeText(Login.this, "Incorrect credentials", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
 
     private void sharedPref_save(String username, int acctStatus) {
         SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
@@ -208,10 +135,79 @@ public class Login extends AppCompatActivity {
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    class downloadFromAPI extends AsyncTask<Void, Void, Void> {
+        ProgressDialog progressDialog;
+        AlertDialog alertDialog;
+
+        LoginDetails loginDetails = null;
+
+        public downloadFromAPI(LoginDetails loginDetails) {
+            this.loginDetails = loginDetails;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Logging in...", true);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Util util = new Util();
+
+            String url = "http://18.220.154.15/SchedulingSystem/";
+
+            HashMap<String, String> hashMap = new HashMap<String, String>();
+            hashMap.put("username", loginDetails.username);
+            hashMap.put("password", loginDetails.password);
+
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().serializeNulls().create();
+            String param = gson.toJson(hashMap);
+
+            String jsonString = util.callApi(url, param, 1);
+
+            LoginDetails obj = new Gson().fromJson(jsonString, LoginDetails.class);
+
+            if (obj.status.equals("200")) {
+
+
+                sharedPref_save(obj.FirstName + " " + obj.LastName, obj.active);
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+
+            if (sharedPref_check()) {
+                if (sharedPref_getAccountStatus() == 1) {
+
+                    Toast.makeText(Login.this, "Welcome", Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(Login.this, Home.class);
+                    startActivity(i);
+
+                } else {
+
+                    alertDialog = new AlertDialog.Builder(Login.this).create();
+                    alertDialog.setTitle(getApplicationContext().getResources().getString(R.string.app_name));
+                    alertDialog.setMessage("Your account is disabled. Contact the Administrator for more information.");
+                    alertDialog.show();
+
+                }
+            } else {
+                Toast.makeText(Login.this, "Incorrect credentials", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
 
