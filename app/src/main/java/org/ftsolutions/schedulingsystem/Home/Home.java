@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import org.ftsolutions.schedulingsystem.Login;
 import org.ftsolutions.schedulingsystem.R;
+import org.ftsolutions.schedulingsystem.Subjects.SubjectlistFragment;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -35,14 +36,6 @@ public class Home extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -102,6 +95,12 @@ public class Home extends AppCompatActivity
             toolbar.setTitle("My Schedule");
         }else if(id==R.id.Subjects){
             toolbar.setTitle("Subjects");
+
+            SubjectlistFragment subjectlistFragment=new SubjectlistFragment();
+            android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_home, subjectlistFragment);
+            fragmentTransaction.commit();
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

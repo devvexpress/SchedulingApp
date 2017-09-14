@@ -1,6 +1,5 @@
 package org.ftsolutions.schedulingsystem;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,10 +10,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,6 +19,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.ftsolutions.schedulingsystem.ActiveAndroidClasses.LoadList_AA;
+import org.ftsolutions.schedulingsystem.GsonModels.LoadList;
+import org.ftsolutions.schedulingsystem.GsonModels.LoginDetails;
 import org.ftsolutions.schedulingsystem.Home.Home;
 
 import java.util.HashMap;
@@ -72,15 +71,15 @@ public class Login extends AppCompatActivity {
                         obj.username = etUsername.getText().toString();
                         obj.password = etPassword.getText().toString();
 
-                        TelephonyManager tManager = (TelephonyManager) Login.this.getSystemService(Context.TELEPHONY_SERVICE);
+                        /*TelephonyManager tManager = (TelephonyManager) Login.this.getSystemService(Context.TELEPHONY_SERVICE);
                         assert tManager != null;
                         @SuppressLint({"MissingPermission", "HardwareIds"}) String uid = tManager.getDeviceId();
                         Log.d("ID", uid);
 
                         String ua = new WebView(Login.this).getSettings().getUserAgentString();
-                        Log.d("AGENT: ", ua);
+                        Log.d("AGENT: ", ua);*/
 
-                        new downloadFromAPI(obj).execute();
+                        new loginAsync(obj).execute();
                     }
 
                 } else {
@@ -94,6 +93,8 @@ public class Login extends AppCompatActivity {
         });
 
     }
+
+    //region Methods
 
     private void sharedPref_save(String username, int acctStatus) {
         SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
@@ -140,13 +141,17 @@ public class Login extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    class downloadFromAPI extends AsyncTask<Void, Void, Void> {
+    //endregion me
+
+    //region Async Login
+
+    class loginAsync extends AsyncTask<Void, Void, Void> {
         ProgressDialog progressDialog;
         AlertDialog alertDialog;
 
         LoginDetails loginDetails = null;
 
-        public downloadFromAPI(LoginDetails loginDetails) {
+        public loginAsync(LoginDetails loginDetails) {
             this.loginDetails = loginDetails;
         }
 
@@ -162,7 +167,8 @@ public class Login extends AppCompatActivity {
 
             Util util = new Util();
 
-            String url = "http://18.220.154.15/SchedulingSystem/";
+            String url = "http://13.113.232.165/SchedulingSystem/";
+
 
             HashMap<String, String> hashMap = new HashMap<String, String>();
             hashMap.put("username", loginDetails.username);
@@ -209,6 +215,89 @@ public class Login extends AppCompatActivity {
             }
         }
     }
+    //endregion
+
+    //region Async Load
+
+    class LoadAsync extends AsyncTask<Void, Void, Void>{
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Downloading data (1) ...", true);
+
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Util util=new Util();
+
+            String url="http://13.113.232.165/SchedulingSystem/getLoad.php";
+
+            String jsonString=util.callApi(url, null, 0);
+
+            LoadList[] gsonObj=new Gson().fromJson(jsonString, LoadList[].class);
+
+            LoadList_AA obj=new LoadList_AA();
+
+            for(int i=0;i<gsonObj.length;i++){
+                obj.classcode=gsonObj[i].classcode;
+                obj.subjectDesc=gsonObj[i].subjectDesc;
+                obj.days=gsonObj[i].days;
+                obj.timeFrom=gsonObj[i].timeFrom;
+                obj.timeTo=gsonObj[i].timeTo;
+
+                obj.insert(obj);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+            
+        }
+    }
+    //endregion
+    
+    //region Async SubjectList
+    
+    class subjectListAsync extends AsyncTask<Void, Void, Void>{
+
+        ProgressDialog progressDialog;
+        
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Downloading data (2) ...", true);
+            
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            Util util=new Util();
+
+            String url="http://13.113.232.165/SchedulingSystem/getSubjects.php";
+
+            String jsonString=util.callApi(url, null, 0);
+
+
+            
+            
+            return null;
+        }
+    }
+    
+    //endregion
 }
 
 
