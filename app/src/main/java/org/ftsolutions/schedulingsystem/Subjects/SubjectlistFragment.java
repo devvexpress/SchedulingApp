@@ -1,13 +1,13 @@
 package org.ftsolutions.schedulingsystem.Subjects;
 
-import android.app.ListFragment;
-import android.icu.text.ListFormatter;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SimpleAdapter;
+import android.support.v4.app.ListFragment;
 
 import org.ftsolutions.schedulingsystem.ActiveAndroidClasses.SubjectList_AA;
 import org.ftsolutions.schedulingsystem.R;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class SubjectlistFragment extends ListFragment{
 
-    List<SubjectList_AA> productList= SubjectList_AA.getSubjects();
+    List<SubjectList_AA> productList= SubjectList_AA.getSubjectList();
 
     String[] classcode;
 

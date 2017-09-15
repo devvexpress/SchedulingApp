@@ -28,8 +28,7 @@
 
         <meta-data
             android:name="AA_MODELS"
-            android:value="org.ftsolutions.schedulingsystem.ActiveAndroidClasses.LoadList_AA"
-            />
+            android:value="org.ftsolutions.schedulingsystem.ActiveAndroidClasses.LoadList_AA" />
 
         <activity
             android:name=".Login"

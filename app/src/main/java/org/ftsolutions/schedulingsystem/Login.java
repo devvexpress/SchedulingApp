@@ -20,8 +20,10 @@ import com.google.gson.GsonBuilder;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.ftsolutions.schedulingsystem.ActiveAndroidClasses.LoadList_AA;
+import org.ftsolutions.schedulingsystem.ActiveAndroidClasses.SubjectList_AA;
 import org.ftsolutions.schedulingsystem.GsonModels.LoadList;
 import org.ftsolutions.schedulingsystem.GsonModels.LoginDetails;
+import org.ftsolutions.schedulingsystem.GsonModels.SubjectList;
 import org.ftsolutions.schedulingsystem.Home.Home;
 
 import java.util.HashMap;
@@ -52,7 +54,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                if (isNetworkAvailable()) {
+                if (NetworkAvailable()) {
 
                     Boolean fieldsValid = true;
 
@@ -93,55 +95,6 @@ public class Login extends AppCompatActivity {
         });
 
     }
-
-    //region Methods
-
-    private void sharedPref_save(String username, int acctStatus) {
-        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
-        SharedPreferences.Editor append = sharedPref.edit();
-        append.putBoolean("isLoggedIn", true);
-        append.putString("name", username);
-        append.putInt("status", acctStatus);
-        append.commit();
-
-    }
-
-    private Boolean sharedPref_check() {
-        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
-        SharedPreferences.Editor append = sharedPref.edit();
-        Boolean loggedIn = sharedPref.getBoolean("isLoggedIn", false);
-        return loggedIn;
-    }
-
-    public void onBackPressed() {
-        Intent startMain = new Intent(Intent.ACTION_MAIN);
-        startMain.addCategory(Intent.CATEGORY_HOME);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startMain);
-    }
-
-    private void sharedPref_clear() {
-        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
-        SharedPreferences.Editor append = sharedPref.edit();
-        append.putBoolean("isLoggedIn", false);
-        append.putString("Username", null);
-        append.commit();
-    }
-
-    private int sharedPref_getAccountStatus() {
-        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
-        SharedPreferences.Editor append = sharedPref.edit();
-        int status = sharedPref.getInt("status", 0);
-        return status;
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    //endregion me
 
     //region Async Login
 
@@ -201,6 +154,7 @@ public class Login extends AppCompatActivity {
                     Toast.makeText(Login.this, "Welcome", Toast.LENGTH_LONG).show();
                     Intent i = new Intent(Login.this, Home.class);
                     startActivity(i);
+                    new getData().execute();
 
                 } else {
 
@@ -221,16 +175,6 @@ public class Login extends AppCompatActivity {
 
     class LoadAsync extends AsyncTask<Void, Void, Void>{
 
-        ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Downloading data (1) ...", true);
-
-
-        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -239,30 +183,27 @@ public class Login extends AppCompatActivity {
 
             String url="http://13.113.232.165/SchedulingSystem/getLoad.php";
 
-            String jsonString=util.callApi(url, null, 0);
+            String jsonString=util.callApi(url, "{\"userId\":"+sharedPref_getUserId()+"}", 1);
 
             LoadList[] gsonObj=new Gson().fromJson(jsonString, LoadList[].class);
 
-            LoadList_AA obj=new LoadList_AA();
+            if(!jsonString.equals("")){
 
-            for(int i=0;i<gsonObj.length;i++){
-                obj.classcode=gsonObj[i].classcode;
-                obj.subjectDesc=gsonObj[i].subjectDesc;
-                obj.days=gsonObj[i].days;
-                obj.timeFrom=gsonObj[i].timeFrom;
-                obj.timeTo=gsonObj[i].timeTo;
+                LoadList_AA obj=new LoadList_AA();
 
-                obj.insert(obj);
+                for(int i=0;i<gsonObj.length;i++){
+                    obj.classcode=gsonObj[i].classcode;
+                    obj.subjectDesc=gsonObj[i].subjectDesc;
+                    obj.days=gsonObj[i].days;
+                    obj.timeFrom=gsonObj[i].timeFrom;
+                    obj.timeTo=gsonObj[i].timeTo;
+
+                    obj.insert(obj);
+                }
+
             }
 
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            progressDialog.dismiss();
-            
         }
     }
     //endregion
@@ -271,15 +212,6 @@ public class Login extends AppCompatActivity {
     
     class subjectListAsync extends AsyncTask<Void, Void, Void>{
 
-        ProgressDialog progressDialog;
-        
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Downloading data (2) ...", true);
-            
-        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -290,7 +222,18 @@ public class Login extends AppCompatActivity {
 
             String jsonString=util.callApi(url, null, 0);
 
+            SubjectList[] gsonObj=new Gson().fromJson(jsonString, SubjectList[].class);
 
+            SubjectList_AA obj=new SubjectList_AA();
+
+            for (int i=0;i<gsonObj.length;i++){
+
+                obj.classcode=gsonObj[i].classcode;
+                obj.subjDesc=gsonObj[i].subjDesc;
+                obj.unit=gsonObj[i].unit;
+
+                obj.insert(obj);
+            }
             
             
             return null;
@@ -298,6 +241,95 @@ public class Login extends AppCompatActivity {
     }
     
     //endregion
+
+    //region Async getData
+
+    class getData extends AsyncTask<Void, Void, Void>{
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(Login.this, getApplicationContext().getResources().getString(R.string.app_name), "Downloading data from server...", true);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            //new LoadAsync().execute();
+            new subjectListAsync().execute();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+        }
+    }
+
+    //endregion
+
+    //region Methods
+
+    private void sharedPref_save(String username, int acctStatus) {
+        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
+        SharedPreferences.Editor append = sharedPref.edit();
+        append.putBoolean("isLoggedIn", true);
+        append.putString("name", username);
+        append.putInt("status", acctStatus);
+        append.commit();
+
+    }
+
+    private Boolean sharedPref_check() {
+        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
+        SharedPreferences.Editor append = sharedPref.edit();
+        Boolean loggedIn = sharedPref.getBoolean("isLoggedIn", false);
+        return loggedIn;
+    }
+
+    public void onBackPressed() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
+    private void sharedPref_clear() {
+        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
+        SharedPreferences.Editor append = sharedPref.edit();
+        append.putBoolean("isLoggedIn", false);
+        append.putInt("userId", 0);
+        append.commit();
+    }
+
+    private int sharedPref_getAccountStatus() {
+        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
+        SharedPreferences.Editor append = sharedPref.edit();
+        int status = sharedPref.getInt("status", 0);
+        return status;
+    }
+
+    private boolean NetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private int sharedPref_getUserId(){
+        SharedPreferences sharedPref = getSharedPreferences(credentialsStore, Context.MODE_PRIVATE);
+        SharedPreferences.Editor append = sharedPref.edit();
+        int userId = sharedPref.getInt("userId", 0);
+        return userId;
+    }
+
+    //endregion me
+
 }
 
 
