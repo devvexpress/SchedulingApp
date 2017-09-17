@@ -153,8 +153,10 @@ public class Login extends AppCompatActivity {
 
                     Toast.makeText(Login.this, "Welcome", Toast.LENGTH_LONG).show();
                     Intent i = new Intent(Login.this, Home.class);
-                    startActivity(i);
+
                     new getData().execute();
+
+                    startActivity(i);
 
                 } else {
 
@@ -259,7 +261,7 @@ public class Login extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            //new LoadAsync().execute();
+            new LoadAsync().execute();
             new subjectListAsync().execute();
 
             return null;

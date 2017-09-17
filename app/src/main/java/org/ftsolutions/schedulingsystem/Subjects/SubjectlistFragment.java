@@ -38,7 +38,7 @@ public class SubjectlistFragment extends ListFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        generateInventory();
+        getSubjects();
 
         HashMap<String, String> map=new HashMap<String, String>();
 
@@ -46,7 +46,7 @@ public class SubjectlistFragment extends ListFragment{
 
             map=new HashMap<String, String>();
             map.put("Classcode", classcode[i]);
-            map.put("Subject Description", String.valueOf(subjDesc[i]));
+            map.put("Subject Description",subjDesc[i].toString());
             map.put("Unit", String.valueOf(unit[i]));
 
             data.add(map);
@@ -68,7 +68,7 @@ public class SubjectlistFragment extends ListFragment{
         super.onStart();
     }
 
-    void generateInventory(){
+    void getSubjects(){
 
         ArrayList<String> classcode=new ArrayList<String>();
         ArrayList<String> subjDesc=new ArrayList<String>();
@@ -76,11 +76,11 @@ public class SubjectlistFragment extends ListFragment{
         for(int i=0;i<productList.size();i++){
 
             classcode.add(productList.get(i).classcode);
-            subjDesc.add(productList.get(i).subjDesc);
+            subjDesc.add(productList.get(i).subjDesc.toString());
             unit.add(productList.get(i).unit);
 
             this.classcode =classcode.toArray(new String[0]);
-            this.subjDesc =unit.toArray(new String[0]);
+            this.subjDesc =subjDesc.toArray(new String[0]);
             this.unit=unit.toArray(new String[0]);
         }
     }

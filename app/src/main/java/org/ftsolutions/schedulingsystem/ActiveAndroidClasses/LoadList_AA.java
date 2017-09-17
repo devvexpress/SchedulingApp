@@ -1,6 +1,9 @@
 package org.ftsolutions.schedulingsystem.ActiveAndroidClasses;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.util.List;
@@ -8,7 +11,7 @@ import java.util.List;
 /**
  * Created by Andrew on 2017-09-15.
  */
-
+@Table(name="LoadList")
 public class LoadList_AA extends Model {
 
     public String classcode;
@@ -41,6 +44,10 @@ public class LoadList_AA extends Model {
                 .where("userId = ?", userId)
                 .execute();
 
+    }
+
+    public static void clean(){
+        ActiveAndroid.execSQL("DELETE FROM LoadList;");
     }
 
 }
